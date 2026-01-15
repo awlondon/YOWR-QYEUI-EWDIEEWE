@@ -13,7 +13,7 @@ class ExtractorConfig:
         ("stft_1024_h256", 1024, 256),
         ("stft_4096_h1024", 4096, 1024),
     )
-    vad_rms_db_threshold: float = -45.0
+    vad_rms_db_threshold: float = -65.0
     vad_min_on_s: float = 0.10
     vad_min_off_s: float = 0.10
     onset_z_thresh: float = 2.5
