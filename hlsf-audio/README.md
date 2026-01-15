@@ -13,3 +13,10 @@ This repo boots a stable intermediate representation (IR) for audio:
 
 ## Example usage (in Python)
 - from hlsf_audio.api import ingest_and_extract_wav
+
+## CLI usage
+Ingest a WAV file to JSON with optional blob storage:
+
+```
+python -m hlsf_audio.cli ingest path.wav --out ir.json --blobs blobs/
+```
