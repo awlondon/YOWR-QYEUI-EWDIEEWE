@@ -21,7 +21,7 @@ def ingest_and_extract_wav(
     d = run_deterministic_extractor(ir, audio=audio, sr=sr, blob=blob, cfg=cfg or ExtractorConfig())
     ir = apply_delta(ir, d)
 
-    ir_dict = ir.model_dump()
+    ir_dict = ir.model_dump(exclude_none=True)
     validate_ir_dict(ir_dict)
     return ir_dict
 
@@ -31,6 +31,6 @@ def ingest_and_extract_array(audio: np.ndarray, sr: int, channels: int = 1, blob
     blob = BlobStore(mode=blob_mode)
     d = run_deterministic_extractor(ir, audio=audio, sr=sr, blob=blob)
     ir = apply_delta(ir, d)
-    ir_dict = ir.model_dump()
+    ir_dict = ir.model_dump(exclude_none=True)
     validate_ir_dict(ir_dict)
     return ir_dict
