@@ -2,6 +2,7 @@ README.md
 pyproject.toml
 src/hlsf_audio/__init__.py
 src/hlsf_audio/api.py
+src/hlsf_audio/cli.py
 src/hlsf_audio/init.py
 src/hlsf_audio.egg-info/PKG-INFO
 src/hlsf_audio.egg-info/SOURCES.txt
