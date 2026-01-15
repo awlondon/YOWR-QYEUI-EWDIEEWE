@@ -4,54 +4,43 @@ import argparse
 import json
 from pathlib import Path
 
-from .api import ingest_and_extract_wav
+from hlsf_audio.api import ingest_and_extract_wav
 
 
-def _cmd_ingest(args: argparse.Namespace) -> int:
-    blob_mode = "memory"
-    blob_root: str | None = None
-    if args.blobs:
-        blob_mode = "fs"
-        blob_root = args.blobs
+def main() -> int:
+    p = argparse.ArgumentParser(prog="hlsf-audio", description="HLSF Audio IR bootstrap CLI")
 
-    ir_dict = ingest_and_extract_wav(args.path, blob_mode=blob_mode, blob_root=blob_root)
+    sub = p.add_subparsers(dest="cmd", required=True)
 
-    if args.out in (None, "-"):
-        print(json.dumps(ir_dict, indent=2, sort_keys=True))
+    ing = sub.add_parser("ingest", help="Ingest WAV and run deterministic extractor")
+    ing.add_argument("wav", type=str, help="Path to .wav file")
+    ing.add_argument("--out", type=str, default="ir.json", help="Output IR JSON file path")
+    ing.add_argument(
+        "--blob-mode",
+        type=str,
+        choices=["memory", "fs"],
+        default="fs",
+        help="Blob storage mode",
+    )
+    ing.add_argument("--blob-root", type=str, default="blobs", help="Blob directory (fs mode)")
+
+    args = p.parse_args()
+
+    if args.cmd == "ingest":
+        out_path = Path(args.out)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+
+        ir = ingest_and_extract_wav(
+            args.wav,
+            blob_mode=args.blob_mode,
+            blob_root=args.blob_root,
+        )
+
+        out_path.write_text(json.dumps(ir, indent=2), encoding="utf-8")
+        print(f"Wrote IR: {out_path}")
         return 0
 
-    out_path = Path(args.out)
-    if out_path.parent != Path("."):
-        out_path.parent.mkdir(parents=True, exist_ok=True)
-    with out_path.open("w", encoding="utf-8") as handle:
-        json.dump(ir_dict, handle, indent=2, sort_keys=True)
-        handle.write("\n")
-    return 0
-
-
-def _build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="python -m hlsf_audio.cli")
-    subparsers = parser.add_subparsers(dest="command")
-
-    ingest = subparsers.add_parser("ingest", help="Ingest a WAV file and write the IR JSON.")
-    ingest.add_argument("path", help="Path to WAV file")
-    ingest.add_argument("--out", required=True, help="Output JSON path, or '-' for stdout")
-    ingest.add_argument(
-        "--blobs",
-        help="Directory to store extracted blobs (enables filesystem blob store)",
-    )
-    ingest.set_defaults(func=_cmd_ingest)
-
-    return parser
-
-
-def main(argv: list[str] | None = None) -> int:
-    parser = _build_parser()
-    args = parser.parse_args(argv)
-    if not hasattr(args, "func"):
-        parser.print_help()
-        return 2
-    return args.func(args)
+    return 1
 
 
 if __name__ == "__main__":
