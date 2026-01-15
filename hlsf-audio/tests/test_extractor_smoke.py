@@ -17,7 +17,7 @@ def test_extractor_smoke():
     blob = BlobStore(mode="memory")
     d = run_deterministic_extractor(ir, audio=audio, sr=sr, blob=blob)
     ir = apply_delta(ir, d)
-    out = ir.model_dump()
+    out = ir.model_dump(exclude_none=True)
     validate_ir_dict(out)
 
     assert any(k.endswith("/stft/logmag") for k in out["fields"].keys())
