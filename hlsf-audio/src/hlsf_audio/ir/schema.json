@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hlsf.audio.ir.v0_1",
+  "title": "HLSF Audio IR v0.1",
+  "type": "object",
+  "required": ["meta", "timebases", "tracks", "fields", "events", "segments", "graph", "evidence"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["ir_version", "source", "created_utc"],
+      "properties": {
+        "ir_version": { "type": "string", "const": "0.1" },
+        "created_utc": { "type": "string" },
+        "source": {
+          "type": "object",
+          "required": ["sr", "channels", "duration_s"],
+          "properties": {
+            "sr": { "type": "integer", "minimum": 8000 },
+            "channels": { "type": "integer", "minimum": 1, "maximum": 16 },
+            "duration_s": { "type": "number", "minimum": 0 }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": true
+    },
+    "timebases": {
+      "type": "object",
+      "required": ["samples", "frames"],
+      "properties": {
+        "samples": {
+          "type": "object",
+          "required": ["sr"],
+          "properties": { "sr": { "type": "integer" } },
+          "additionalProperties": false
+        },
+        "frames": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "hop", "win"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "hop": { "type": "integer", "minimum": 1 },
+              "win": { "type": "integer", "minimum": 8 }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "tracks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "type"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "type": { "type": "string", "enum": ["mixture", "stem", "channel"] },
+          "parent": { "type": "string" },
+          "label": { "type": "string" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "fields": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["kind", "shape", "dtype", "ref"],
+        "properties": {
+          "kind": { "type": "string", "enum": ["ndarray", "sparse", "scalar"] },
+          "shape": {
+            "type": "array",
+            "items": { "type": "integer", "minimum": 1 },
+            "minItems": 1
+          },
+          "dtype": { "type": "string", "enum": ["f32", "f16", "i32", "u8"] },
+          "ref": {
+            "type": "object",
+            "required": ["store", "key"],
+            "properties": {
+              "store": { "type": "string", "enum": ["memory", "fs"] },
+              "key": { "type": "string", "minLength": 1 }
+            },
+            "additionalProperties": false
+          },
+          "timebase": { "type": "string" },
+          "track": { "type": "string" },
+          "desc": { "type": "string" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "t0", "t1", "type", "confidence", "track", "tags"],
+        "properties": {
+          "id": { "type": "string" },
+          "t0": { "type": "number", "minimum": 0 },
+          "t1": { "type": "number", "minimum": 0 },
+          "type": { "type": "string", "minLength": 1 },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+          "track": { "type": "string" },
+          "tags": { "type": "array", "items": { "type": "string" } },
+          "attrs": { "type": "object", "additionalProperties": true },
+          "evidence": { "type": "array", "items": { "type": "string" } }
+        },
+        "additionalProperties": false
+      }
+    },
+    "segments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "t0", "t1", "type", "confidence", "track", "tags"],
+        "properties": {
+          "id": { "type": "string" },
+          "t0": { "type": "number", "minimum": 0 },
+          "t1": { "type": "number", "minimum": 0 },
+          "type": { "type": "string", "minLength": 1 },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+          "track": { "type": "string" },
+          "tags": { "type": "array", "items": { "type": "string" } },
+          "attrs": { "type": "object", "additionalProperties": true },
+          "evidence": { "type": "array", "items": { "type": "string" } }
+        },
+        "additionalProperties": false
+      }
+    },
+    "graph": {
+      "type": "object",
+      "required": ["nodes", "edges"],
+      "properties": {
+        "nodes": { "type": "array" },
+        "edges": { "type": "array" }
+      },
+      "additionalProperties": false
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "kind", "ref", "span", "note"],
+        "properties": {
+          "id": { "type": "string" },
+          "kind": { "type": "string", "enum": ["field", "frame_range", "time_range", "exemplar"] },
+          "ref": { "type": "string" },
+          "span": {
+            "type": "object",
+            "required": ["t0", "t1"],
+            "properties": {
+              "t0": { "type": "number", "minimum": 0 },
+              "t1": { "type": "number", "minimum": 0 }
+            },
+            "additionalProperties": false
+          },
+          "note": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
