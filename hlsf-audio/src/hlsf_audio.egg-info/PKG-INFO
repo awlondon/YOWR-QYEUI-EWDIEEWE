@@ -1,0 +1,10 @@
+Metadata-Version: 2.4
+Name: hlsf-audio
+Version: 0.1.0
+Summary: HLSF Audio IR bootstrap: deterministic extractor + plugin-ready IR
+Requires-Python: >=3.11
+Requires-Dist: numpy>=1.26
+Requires-Dist: scipy>=1.11
+Requires-Dist: pydantic>=2.6
+Requires-Dist: jsonschema>=4.21
+Requires-Dist: pytest>=8.0
